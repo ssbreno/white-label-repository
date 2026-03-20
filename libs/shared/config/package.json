@@ -1,0 +1,14 @@
+{
+  "name": "@white-label/shared-config",
+  "version": "0.1.0",
+  "description": "Shared configuration for the white-label monorepo",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

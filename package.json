@@ -1,0 +1,38 @@
+{
+  "name": "white-label-repository",
+  "version": "0.0.1",
+  "license": "GPL-3.0",
+  "private": true,
+  "scripts": {
+    "dev": "nx run-many --target=dev --all --parallel",
+    "dev:frontend": "nx dev frontend",
+    "dev:backend": "nx dev backend",
+    "build": "nx run-many --target=build --all",
+    "build:frontend": "nx build frontend",
+    "build:backend": "nx build backend",
+    "test": "nx run-many --target=test --all",
+    "test:frontend": "nx test frontend",
+    "lint": "nx run-many --target=lint --all",
+    "lint:frontend": "nx lint frontend",
+    "format": "nx format:write",
+    "graph": "nx graph",
+    "affected:test": "nx affected --target=test",
+    "affected:lint": "nx affected --target=lint",
+    "affected:build": "nx affected --target=build"
+  },
+  "devDependencies": {
+    "@nx/eslint": "^20.0.0",
+    "@nx/js": "^20.0.0",
+    "@nx/next": "^20.0.0",
+    "@nx/workspace": "^20.0.0",
+    "nx": "^20.0.0",
+    "typescript": "^5.5.0",
+    "prettier": "^3.3.0"
+  },
+  "workspaces": [
+    "apps/frontend",
+    "libs/shared/types",
+    "libs/shared/utils",
+    "libs/shared/config"
+  ]
+}

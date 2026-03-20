@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "golang.go",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "nrwl.angular-console",
+    "ms-vscode.vscode-typescript-next",
+    "prisma.prisma",
+    "mikestead.dotenv",
+    "humao.rest-client",
+    "ms-azuretools.vscode-docker"
+  ]
+}
