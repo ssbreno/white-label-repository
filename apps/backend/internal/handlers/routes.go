@@ -6,9 +6,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ssbreno/white-label-repository/backend/internal/ai"
 	"github.com/ssbreno/white-label-repository/backend/internal/config"
 	"github.com/ssbreno/white-label-repository/backend/internal/database"
+	"github.com/ssbreno/white-label-repository/backend/internal/middleware"
 	"github.com/ssbreno/white-label-repository/backend/internal/models"
+	"github.com/ssbreno/white-label-repository/backend/internal/repositories"
+	"github.com/ssbreno/white-label-repository/backend/internal/services"
 )
 
 // RegisterRoutes sets up all API routes
@@ -20,14 +24,27 @@ func RegisterRoutes(router *gin.Engine, db *database.DB, cfg *config.Config) {
 	api.GET("/health", healthHandler(db, cfg))
 
 	// Users
-	userHandler := newUserHandler(db)
+	userRepo := repositories.NewUserRepository(db)
+	userSvc := services.NewUserService(userRepo)
+	userH := newUserHandler(userSvc)
 	users := api.Group("/users")
 	{
-		users.GET("", userHandler.list)
-		users.GET("/:id", userHandler.getByID)
-		users.POST("", userHandler.create)
-		users.PUT("/:id", userHandler.update)
-		users.DELETE("/:id", userHandler.delete)
+		users.GET("", userH.list)
+		users.GET("/:id", userH.getByID)
+		users.POST("", userH.create)
+		users.PUT("/:id", userH.update)
+		users.DELETE("/:id", userH.delete)
+	}
+
+	// AI Gateway
+	aiRegistry := ai.NewRegistry(cfg.AI)
+	aiH := newAIHandler(aiRegistry)
+	aiGroup := api.Group("/ai")
+	aiGroup.Use(middleware.RateLimiter(cfg.AI.RateLimit.RPS, cfg.AI.RateLimit.Burst))
+	{
+		aiGroup.POST("/chat", aiH.chat)
+		aiGroup.GET("/models", aiH.listModels)
+		aiGroup.GET("/providers", aiH.listProviders)
 	}
 }
 

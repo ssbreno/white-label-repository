@@ -4,19 +4,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ssbreno/white-label-repository/backend/internal/database"
 	"github.com/ssbreno/white-label-repository/backend/internal/models"
-	"github.com/ssbreno/white-label-repository/backend/internal/repositories"
 	"github.com/ssbreno/white-label-repository/backend/internal/services"
 )
 
 type userHandler struct {
-	service *services.UserService
+	service services.UserServiceInterface
 }
 
-func newUserHandler(db *database.DB) *userHandler {
-	repo := repositories.NewUserRepository(db)
-	svc := services.NewUserService(repo)
+func newUserHandler(svc services.UserServiceInterface) *userHandler {
 	return &userHandler{service: svc}
 }
 

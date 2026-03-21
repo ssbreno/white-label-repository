@@ -1,5 +1,8 @@
 # White Label Repository
 
+[![CI](https://github.com/ssbreno/white-label-repository/actions/workflows/ci.yml/badge.svg)](https://github.com/ssbreno/white-label-repository/actions/workflows/ci.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 A production-ready, open-source white label monorepo built with **Nx**, featuring a **Go backend** with PostgreSQL and a **Next.js frontend** with shadcn/ui and Tailwind CSS.
 
 ## Architecture
@@ -28,10 +31,13 @@ white-label-repository/
 | Layer      | Technology                                  |
 |------------|---------------------------------------------|
 | Backend    | Go 1.21+, Gin, PostgreSQL, pgx             |
-| Frontend   | Next.js 14+, React 18, TypeScript 5         |
+| Frontend   | Next.js 15, React 18, TypeScript 5          |
 | UI         | shadcn/ui, Tailwind CSS                     |
+| AI Gateway | OpenAI, Anthropic, Google (unified API)     |
 | Monorepo   | Nx 20+                                      |
 | Database   | PostgreSQL 16                               |
+| Testing    | Go test + testify, Jest + Testing Library   |
+| CI/CD      | GitHub Actions                              |
 | Container  | Docker, Docker Compose                      |
 
 ## Quick Start
@@ -84,17 +90,21 @@ npm run dev:frontend
 npm run dev
 ```
 
-## Available Scripts
+## Available Commands
 
-| Script             | Description                          |
+Run `make help` for the full list. Key commands:
+
+| Command            | Description                          |
 |--------------------|--------------------------------------|
-| `npm run dev`      | Run all services in development mode |
-| `npm run dev:frontend` | Run only the frontend            |
-| `npm run dev:backend`  | Run only the backend             |
-| `npm run build`    | Build all applications               |
-| `npm run test`     | Run all tests                        |
-| `npm run lint`     | Lint all projects                    |
-| `npm run graph`    | Visualize project dependency graph   |
+| `make dev`         | Run all services in development mode |
+| `make build`       | Build all applications               |
+| `make test`        | Run all tests (backend + frontend)   |
+| `make lint`        | Lint all projects                    |
+| `make format`      | Format code with Prettier            |
+| `make docker-up`   | Start Docker services                |
+| `make docker-down` | Stop Docker services                 |
+| `make db-shell`    | Open PostgreSQL shell                |
+| `make graph`       | Visualize Nx dependency graph        |
 
 ## Development Workflow
 
@@ -121,6 +131,9 @@ This repository is designed as a template for multiple client projects. See [doc
 - [Architecture Overview](docs/ARCHITECTURE.md)
 - [Customization Guide](docs/CUSTOMIZATION.md)
 - [Deployment Guide](docs/DEPLOYMENT.md)
+- [Claude Code Guide](CLAUDE.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Backend README](apps/backend/README.md)
 - [Frontend README](apps/frontend/README.md)
 
@@ -132,15 +145,19 @@ This repository is designed as a template for multiple client projects. See [doc
 apps/backend/
 ├── cmd/server/         # Application entry point
 ├── internal/
+│   ├── ai/             # AI provider gateway (OpenRouter-style)
 │   ├── config/         # App configuration
 │   ├── database/       # DB connection & migrations
 │   ├── handlers/       # HTTP request handlers
-│   ├── middleware/     # HTTP middleware (CORS, auth, logging)
+│   ├── middleware/      # HTTP middleware (CORS, rate limiting)
 │   ├── models/         # Data models
+│   ├── mocks/          # Test mocks
 │   ├── repositories/   # Data access layer
-│   └── services/       # Business logic
-├── migrations/         # SQL migrations
+│   ├── services/       # Business logic
+│   └── testutil/       # Test helpers
 ├── Dockerfile
+├── Makefile
+├── .golangci.yml       # Go linting config
 ├── go.mod
 └── README.md
 ```
@@ -170,7 +187,31 @@ apps/frontend/
 | `shared-utils`  | Date, validation, string helpers  |
 | `shared-config` | API endpoints, env schemas        |
 
+## AI Gateway
+
+The backend includes an OpenRouter-style AI gateway that provides a unified API for multiple AI providers.
+
+### Supported Providers
+
+| Provider  | Models                                    |
+|-----------|-------------------------------------------|
+| OpenAI    | GPT-4o, GPT-4o Mini, GPT-4 Turbo, GPT-3.5 |
+| Anthropic | Claude Sonnet 4, Claude 3.5 Sonnet/Haiku  |
+| Google    | Gemini 2.0 Flash, Gemini 1.5 Pro/Flash    |
+
+### API Endpoints
+
+```
+POST /api/ai/chat       # Chat completion (sync or streaming via SSE)
+GET  /api/ai/models     # List all available models
+GET  /api/ai/providers  # List enabled providers
+```
+
+Providers auto-enable when their API key is configured in `.env`. Streaming is supported via Server-Sent Events (SSE) by setting `"stream": true` in the request.
+
 ## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/my-feature`

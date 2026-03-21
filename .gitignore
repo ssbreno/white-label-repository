@@ -56,3 +56,6 @@ Thumbs.db
 
 # Nx Cloud
 .nxignore
+
+# Claude Code (user-specific overrides)
+.claude/local/
